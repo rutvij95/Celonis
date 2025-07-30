@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/counter-tasks")
@@ -31,9 +32,57 @@ public class CounterTaskController {
     }
 
     @PutMapping("/{taskId}/execute")
-    public ResponseEntity<Void> executeCounterTask(@PathVariable String taskId) {
-        counterService.runCounterTask(taskId);
-        return ResponseEntity.accepted().build();
+    public ResponseEntity<Map<String, String>> executeCounterTask(@PathVariable String taskId) {
+        try {
+            // Start the task asynchronously
+            counterService.runCounterTask(taskId);
+
+            // Return immediate response indicating task has started
+            Map<String, String> response = Map.of(
+                    "message", "Counter task started successfully",
+                    "taskId", taskId,
+                    "status", "RUNNING"
+            );
+
+            return ResponseEntity.accepted().body(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> errorResponse = Map.of(
+                    "error", e.getMessage(),
+                    "taskId", taskId
+            );
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = Map.of(
+                    "error", "Failed to start counter task",
+                    "taskId", taskId
+            );
+            return ResponseEntity.unprocessableEntity().body(errorResponse);
+        }
+    }
+
+    @PutMapping("/{taskId}/cancel")
+    public ResponseEntity<Map<String, String>> cancelCounterTask(@PathVariable String taskId) {
+        try {
+            counterService.cancelCounterTask(taskId);
+            Map<String, String> response = Map.of(
+                    "message", "Counter task cancelled successfully",
+                    "taskId", taskId,
+                    "status", "CANCELLED"
+            );
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> errorResponse = Map.of(
+                    "error", e.getMessage(),
+                    "taskId", taskId
+            );
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = Map.of(
+                    "error", "Failed to cancel counter task",
+                    "taskId", taskId
+            );
+            return ResponseEntity.unprocessableEntity().body(errorResponse);
+        }
     }
 
 }
