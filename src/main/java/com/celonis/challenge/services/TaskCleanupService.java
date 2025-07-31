@@ -25,13 +25,13 @@ public class TaskCleanupService {
     @Autowired
     private CounterTaskRepository counterTaskRepository;
 
-    @Scheduled(fixedRate = 30000) // Every minute
+    @Scheduled(fixedRate = 60000) // Every minute
 //    @Scheduled(cron = "1 * * * * *")  // Every minute
     @Transactional
     public void cleanupOldTasks() {
         logger.info("Starting cleanup of old tasks...");
         Long timeToMillis = 7 * 24 * 60 * 60 * 1000L; // 7 days in milliseconds
-        Instant minusInstant = TimeUtil.getCurrentTime().toInstant().minus(30, ChronoUnit.SECONDS);
+        Instant minusInstant = TimeUtil.getCurrentTime().toInstant().minus(timeToMillis, ChronoUnit.SECONDS);
 
 
         counterTaskRepository.findAllByTaskStatusInAndCreationDateAfter(
