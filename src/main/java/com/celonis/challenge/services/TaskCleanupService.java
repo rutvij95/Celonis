@@ -1,7 +1,9 @@
 package com.celonis.challenge.services;
 
+import com.celonis.challenge.model.CounterTask;
 import com.celonis.challenge.model.TaskStatus;
 import com.celonis.challenge.repository.CounterTaskRepository;
+import com.celonis.challenge.util.TimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,20 +24,20 @@ public class TaskCleanupService {
     @Autowired
     private CounterTaskRepository counterTaskRepository;
 
-    //    @Scheduled(fixedRate = 86400000)
-    @Scheduled(cron = "* * 0 * * *")  // Runs every day at 00 Hr
+    @Scheduled(fixedRate = 30000) // Every minute
+//    @Scheduled(cron = "1 * * * * *")  // Every minute
     @Transactional
     public void cleanupOldTasks() {
         logger.info("Starting cleanup of old tasks...");
 
-        Instant minusSevenDaysInstant = Instant.now().minus(7, ChronoUnit.DAYS);
-        Date minusSevenDays = Date.from(minusSevenDaysInstant);
+        Instant minusInstant = TimeUtil.getCurrentTime().toInstant().minus(30, ChronoUnit.SECONDS);
 
-        counterTaskRepository.findAllByCreationDateBefore(minusSevenDays)
+        counterTaskRepository.findAllByTaskStatusAndCreationDateBefore(TaskStatus.CREATED, Date.from(minusInstant))
                 .forEach(task -> {
                     logger.info("Soft deleting old task with ID: {}", task.getId());
                     task.setTaskStatus(TaskStatus.ABORTED);
                     counterTaskRepository.save(task);
+                    logger.info("Task with ID: {} has been marked as ABORTED", task.getId());
                 });
     }
 }

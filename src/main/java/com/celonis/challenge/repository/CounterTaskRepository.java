@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -13,5 +14,7 @@ public interface CounterTaskRepository extends JpaRepository<CounterTask, String
 
     Optional<CounterTask> findByIdAndTaskStatus(String taskId, TaskStatus taskStatus);
 
-    Iterable<CounterTask> findAllByCreationDateBefore(Date minusSevenDays);
+    List<CounterTask> findAllByTaskStatusNot(TaskStatus taskStatus);
+
+    Iterable<CounterTask> findAllByTaskStatusAndCreationDateBefore(TaskStatus taskStatus, Date from);
 }

@@ -1,16 +1,18 @@
 package com.celonis.challenge.controllers;
 
 import com.celonis.challenge.model.CounterTask;
+import com.celonis.challenge.model.TaskStatus;
 import com.celonis.challenge.services.CounterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/counter-tasks")
+@RequestMapping("/api/v1/counter-tasks")
 public class CounterTaskController {
 
     @Autowired
@@ -22,11 +24,19 @@ public class CounterTaskController {
     }
 
     @GetMapping("/{taskId}")
-    public CounterTask getCounterTask(@PathVariable String taskId) {
-        return counterService.getCounterTask(taskId);
+    public ResponseEntity<?> getCounterTask(@PathVariable String taskId) {
+        try {
+            return ResponseEntity.ok(counterService.getCounterTask(taskId));
+        } catch (Exception e) {
+            Map<String, String> errorResponse = Map.of(
+                    "error", e.getMessage()
+            );
+            return ResponseEntity.unprocessableEntity().body(errorResponse);
+        }
     }
 
     @PostMapping
+    @Valid
     public CounterTask createCounterTask(@RequestBody CounterTask counterTask) {
         return counterService.createCounterTask(counterTask);
     }
@@ -34,21 +44,16 @@ public class CounterTaskController {
     @PutMapping("/{taskId}/execute")
     public ResponseEntity<Map<String, String>> executeCounterTask(@PathVariable String taskId) {
         try {
-            // Start the task asynchronously
-            counterService.runCounterTask(taskId);
-
-            // Return immediate response indicating task has started
+            CounterTask task = counterService.getCounterTaskByStatus(taskId, TaskStatus.CREATED);
+            counterService.runCounterTask(task);
             Map<String, String> response = Map.of(
                     "message", "Counter task started successfully",
-                    "taskId", taskId,
-                    "status", "RUNNING"
+                    "taskId", taskId
             );
-
-            return ResponseEntity.accepted().body(response);
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             Map<String, String> errorResponse = Map.of(
-                    "error", e.getMessage(),
-                    "taskId", taskId
+                    "error", e.getMessage()
             );
             return ResponseEntity.badRequest().body(errorResponse);
         } catch (Exception e) {
@@ -72,8 +77,8 @@ public class CounterTaskController {
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             Map<String, String> errorResponse = Map.of(
-                    "error", e.getMessage(),
-                    "taskId", taskId
+                    "error", e.getMessage()
+
             );
             return ResponseEntity.badRequest().body(errorResponse);
         } catch (Exception e) {

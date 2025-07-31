@@ -49,7 +49,7 @@ public class CounterServiceTest {
     public void testGetAllCounterTasks() {
         // Given
         List<CounterTask> expectedTasks = Arrays.asList(testTask);
-        when(counterTaskRepository.findAll()).thenReturn(expectedTasks);
+        when(counterTaskRepository.findAllByTaskStatusNot(TaskStatus.ABORTED)).thenReturn(expectedTasks);
 
         // When
         List<CounterTask> result = counterService.getAllCounterTasks();
@@ -57,7 +57,7 @@ public class CounterServiceTest {
         // Then
         assertEquals(expectedTasks, result);
 
-        verify(counterTaskRepository).findAll(); // Verify that CounterTaskRepository is called.
+        verify(counterTaskRepository).findAllByTaskStatusNot(TaskStatus.ABORTED); // Verify that CounterTaskRepository is called.
     }
 
     @Test
@@ -172,7 +172,7 @@ public class CounterServiceTest {
                 .thenReturn(testTask);
 
         // When
-        CompletableFuture<Void> future = counterService.runCounterTask(testTaskId);
+        CompletableFuture<Void> future = counterService.runCounterTask(testTask);
 
         Thread.sleep(6000); // Should be at least more than 6.
 
@@ -201,7 +201,7 @@ public class CounterServiceTest {
                 .thenReturn(testTask);
 
         // When
-        CompletableFuture<Void> future = counterService.runCounterTask(testTaskId);
+        CompletableFuture<Void> future = counterService.runCounterTask(testTask);
 
         Thread.sleep(2000);
 
