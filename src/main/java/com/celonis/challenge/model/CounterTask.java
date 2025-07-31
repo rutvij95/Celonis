@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "counter_tasks")
@@ -85,5 +86,18 @@ public class CounterTask {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CounterTask that = (CounterTask) o;
+        return startValue == that.startValue && endValue == that.endValue && currentValue == that.currentValue && Objects.equals(id, that.id) && Objects.equals(creationDate, that.creationDate) && Objects.equals(updateDate, that.updateDate) && taskStatus == that.taskStatus;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, creationDate, updateDate, taskStatus, startValue, endValue, currentValue);
     }
 }

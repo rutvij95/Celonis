@@ -23,7 +23,7 @@ public class TaskCleanupService {
     private CounterTaskRepository counterTaskRepository;
 
     //    @Scheduled(fixedRate = 86400000)
-    @Scheduled(cron = "1 * * * * *")  // Run every minute for testing purposes
+    @Scheduled(cron = "* * 0 * * *")  // Runs every day at 00 Hr
     @Transactional
     public void cleanupOldTasks() {
         logger.info("Starting cleanup of old tasks...");
