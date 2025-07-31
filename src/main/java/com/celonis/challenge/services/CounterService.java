@@ -37,40 +37,44 @@ public class CounterService {
                 logger.info("{} : TaskId changing state to Running", taskId);
                 counterTask.setTaskStatus(TaskStatus.RUNNING);
                 counterTask.setUpdateDate(new Date());
-                counterTaskRepository.save(counterTask);
+                saveCounterTask(counterTask);
 
                 logger.info("Starting Execution... ");
                 for (int i = counterTask.getStartValue(); i <= counterTask.getEndValue(); i++) {
                     Optional<CounterTask> currentTaskState = counterTaskRepository.findById(taskId);
                     if (currentTaskState.isEmpty() || currentTaskState.get().getTaskStatus() == TaskStatus.CANCELLED) {
-                        System.out.println("Task " + taskId + " was cancelled or deleted.");
+                        logger.info("Counter task with ID: {} has been cancelled " +
+                                "or does not exist anymore. Stopping the execution.", taskId);
                         return;
                     }
                     counterTask.setCurrentValue(i);
                     counterTask.setUpdateDate(new Date());
-                    counterTaskRepository.save(counterTask);
+                    saveCounterTask(counterTask);
                     Thread.sleep(1000);
                 }
+                logger.info("Execution compelted for taskId: {}", taskId);
 
                 counterTask.setTaskStatus(TaskStatus.COMPLETED);
                 counterTask.setUpdateDate(new Date());
-                counterTaskRepository.save(counterTask);
+                saveCounterTask(counterTask);
             } catch (IllegalArgumentException e) {
-                System.err.println("Error: " + e.getMessage());
+                logger.error(e.getMessage());
                 throw new RuntimeException(e);
             } catch (InterruptedException e) {
+                logger.error("Counter task interrupted: {}", e.getMessage());
                 counterTaskRepository.findById(taskId).ifPresent(task -> {
                     task.setTaskStatus(TaskStatus.FAILED);
                     task.setUpdateDate(new Date());
-                    counterTaskRepository.save(task);
+                    saveCounterTask(task);
                 });
                 Thread.currentThread().interrupt();
                 throw new RuntimeException("Counter task interrupted", e);
             } catch (Exception e) {
+                logger.error(e.getMessage());
                 counterTaskRepository.findById(taskId).ifPresent(task -> {
                     task.setTaskStatus(TaskStatus.FAILED);
                     task.setUpdateDate(new Date());
-                    counterTaskRepository.save(task);
+                    saveCounterTask(task);
                 });
                 throw new RuntimeException("Counter task failed", e);
             }
@@ -78,16 +82,26 @@ public class CounterService {
     }
 
     public List<CounterTask> getAllCounterTasks() {
+        logger.info("Fetching all counter tasks");
         return counterTaskRepository.findAll();
     }
 
     public CounterTask createCounterTask(CounterTask counterTask) {
+        logger.info("Creating new task ...");
         if (counterTask.getStartValue() >= counterTask.getEndValue()) {
+            logger.error("Start value must be less than end value.");
             throw new IllegalArgumentException("Start value must be less than end value.");
         }
         counterTask.setCreationDate(new Date());
         counterTask.setUpdateDate(new Date());
         counterTask.setTaskStatus(TaskStatus.CREATED);
+//        return saveCounterTask(counterTask);
+        CounterTask ct = saveCounterTask(counterTask);
+        logger.info("Counter task created with ID: {}", ct.getId());
+        return ct;
+    }
+
+    private CounterTask saveCounterTask(CounterTask counterTask) {
         return counterTaskRepository.save(counterTask);
     }
 
@@ -97,14 +111,17 @@ public class CounterService {
     }
 
     public void cancelCounterTask(String taskId) {
+        logger.info("Cancelling counter taks with ID: {}", taskId);
         CounterTask counterTask = counterTaskRepository.findById(taskId)
                 .orElseThrow(() -> new IllegalArgumentException("Counter task not found with id: " + taskId));
 
         if (counterTask.getTaskStatus() == TaskStatus.RUNNING) {
             counterTask.setTaskStatus(TaskStatus.CANCELLED);
             counterTask.setUpdateDate(new Date());
-            counterTaskRepository.save(counterTask);
+            saveCounterTask(counterTask);
+            logger.info("Counter task with ID: {} has been cancelled successfully.", taskId);
         } else {
+            logger.error("Counter task is not running and cannot be cancelled.");
             throw new IllegalArgumentException("Counter task is not running and cannot be cancelled.");
         }
     }
