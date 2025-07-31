@@ -21,6 +21,6 @@ public interface CounterTaskRepository extends JpaRepository<CounterTask, String
 
 //    Iterable<CounterTask> findAllByTaskStatusAndCreationDateBefore(TaskStatus taskStatus, Date from);
 
-    @Query("SELECT ct FROM CounterTask ct WHERE ct.taskStatus IN :statuses AND ct.creationDate > :creationDate")
-    List<CounterTask> findAllByTaskStatusInAndCreationDateAfter(@Param("statuses") List<TaskStatus> statuses, @Param("creationDate") Date creationDate);
+    @Query("SELECT ct FROM CounterTask ct WHERE ct.taskStatus IN :statuses AND ct.creationDate < :creationDate")
+    List<CounterTask> findAllByTaskStatusInAndCreationDateBefore(@Param("statuses") List<TaskStatus> statuses, @Param("creationDate") Date creationDate);
 }

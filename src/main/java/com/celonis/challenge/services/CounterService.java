@@ -39,7 +39,8 @@ public class CounterService {
                 logger.info("Starting Execution... ");
                 for (int i = counterTask.getStartValue(); i <= counterTask.getEndValue(); i++) {
                     CounterTask currentTaskState = getCounterTask(counterTask.getId());
-                    if (currentTaskState.getTaskStatus() == TaskStatus.CANCELLED) {
+                    if (currentTaskState.getTaskStatus() == TaskStatus.CANCELLED ||
+                            currentTaskState.getTaskStatus() == TaskStatus.ABORTED) {
                         logger.info("Counter task with ID: {} has been cancelled " +
                                 "or does not exist anymore. Stopping the execution.", counterTask.getId());
                         return;
@@ -119,7 +120,7 @@ public class CounterService {
         logger.info("Cancelling counter taks with ID: {}", taskId);
         CounterTask counterTask = getCounterTask(taskId);
 
-        if (counterTask.getTaskStatus() == TaskStatus.RUNNING) {
+        if (counterTask.getTaskStatus() == TaskStatus.RUNNING || counterTask.getTaskStatus() == TaskStatus.CREATED) {
             counterTask.setTaskStatus(TaskStatus.CANCELLED);
             counterTask.setUpdateDate(TimeUtil.getCurrentTime());
             saveCounterTask(counterTask);

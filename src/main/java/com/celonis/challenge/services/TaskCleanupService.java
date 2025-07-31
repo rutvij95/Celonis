@@ -34,7 +34,7 @@ public class TaskCleanupService {
         Instant minusInstant = TimeUtil.getCurrentTime().toInstant().minus(timeToMillis, ChronoUnit.SECONDS);
 
 
-        counterTaskRepository.findAllByTaskStatusInAndCreationDateAfter(
+        counterTaskRepository.findAllByTaskStatusInAndCreationDateBefore(
                         List.of(TaskStatus.CREATED, TaskStatus.RUNNING), Date.from(minusInstant))
                 .forEach(task -> {
                     logger.info("Soft deleting old task with ID: {}", task.getId());
