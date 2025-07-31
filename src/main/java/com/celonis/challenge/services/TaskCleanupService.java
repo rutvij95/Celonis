@@ -14,6 +14,7 @@ import javax.transaction.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 
 
 @Service
@@ -29,10 +30,12 @@ public class TaskCleanupService {
     @Transactional
     public void cleanupOldTasks() {
         logger.info("Starting cleanup of old tasks...");
-
+        Long timeToMillis = 7 * 24 * 60 * 60 * 1000L; // 7 days in milliseconds
         Instant minusInstant = TimeUtil.getCurrentTime().toInstant().minus(30, ChronoUnit.SECONDS);
 
-        counterTaskRepository.findAllByTaskStatusAndCreationDateBefore(TaskStatus.CREATED, Date.from(minusInstant))
+
+        counterTaskRepository.findAllByTaskStatusInAndCreationDateAfter(
+                        List.of(TaskStatus.CREATED, TaskStatus.RUNNING), Date.from(minusInstant))
                 .forEach(task -> {
                     logger.info("Soft deleting old task with ID: {}", task.getId());
                     task.setTaskStatus(TaskStatus.ABORTED);

@@ -37,8 +37,16 @@ public class CounterTaskController {
 
     @PostMapping
     @Valid
-    public CounterTask createCounterTask(@RequestBody CounterTask counterTask) {
-        return counterService.createCounterTask(counterTask);
+    public ResponseEntity<?> createCounterTask(@RequestBody CounterTask counterTask) {
+        try {
+            return ResponseEntity.ok(counterService.createCounterTask(counterTask));
+        } catch (Exception e) {
+            Map<String, String> errorResponse = Map.of(
+                    "error", e.getMessage()
+            );
+            return ResponseEntity.unprocessableEntity().body(errorResponse);
+        }
+
     }
 
     @PutMapping("/{taskId}/execute")
@@ -55,7 +63,7 @@ public class CounterTaskController {
             Map<String, String> errorResponse = Map.of(
                     "error", e.getMessage()
             );
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.unprocessableEntity().body(errorResponse);
         } catch (Exception e) {
             Map<String, String> errorResponse = Map.of(
                     "error", "Failed to start counter task",
@@ -80,7 +88,7 @@ public class CounterTaskController {
                     "error", e.getMessage()
 
             );
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.unprocessableEntity().body(errorResponse);
         } catch (Exception e) {
             Map<String, String> errorResponse = Map.of(
                     "error", "Failed to cancel counter task",
