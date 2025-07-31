@@ -3,7 +3,9 @@ package com.celonis.challenge.controllers;
 import com.celonis.challenge.model.CounterTask;
 import com.celonis.challenge.model.TaskStatus;
 import com.celonis.challenge.services.CounterService;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,19 +21,19 @@ public class CounterTaskController {
     private CounterService counterService;
 
     @GetMapping("/")
-    public List<CounterTask> getAllCounterTasks() {
-        return counterService.getAllCounterTasks();
+    public ResponseEntity<List<CounterTask>> getAllCounterTasks() {
+        return ResponseEntity.status(HttpStatus.OK).body(counterService.getAllCounterTasks());
     }
 
     @GetMapping("/{taskId}")
     public ResponseEntity<?> getCounterTask(@PathVariable String taskId) {
         try {
-            return ResponseEntity.ok(counterService.getCounterTask(taskId));
+            return ResponseEntity.status(HttpStatus.OK).body(counterService.getCounterTask(taskId));
         } catch (Exception e) {
             Map<String, String> errorResponse = Map.of(
                     "error", e.getMessage()
             );
-            return ResponseEntity.unprocessableEntity().body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
@@ -39,12 +41,12 @@ public class CounterTaskController {
     @Valid
     public ResponseEntity<?> createCounterTask(@RequestBody CounterTask counterTask) {
         try {
-            return ResponseEntity.ok(counterService.createCounterTask(counterTask));
+            return ResponseEntity.status(HttpStatus.OK).body(counterService.createCounterTask(counterTask));
         } catch (Exception e) {
             Map<String, String> errorResponse = Map.of(
                     "error", e.getMessage()
             );
-            return ResponseEntity.unprocessableEntity().body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
 
     }
@@ -58,18 +60,18 @@ public class CounterTaskController {
                     "message", "Counter task started successfully",
                     "taskId", taskId
             );
-            return ResponseEntity.ok(response);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (IllegalArgumentException e) {
             Map<String, String> errorResponse = Map.of(
                     "error", e.getMessage()
             );
-            return ResponseEntity.unprocessableEntity().body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         } catch (Exception e) {
             Map<String, String> errorResponse = Map.of(
                     "error", "Failed to start counter task",
                     "taskId", taskId
             );
-            return ResponseEntity.unprocessableEntity().body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
@@ -82,19 +84,19 @@ public class CounterTaskController {
                     "taskId", taskId,
                     "status", "CANCELLED"
             );
-            return ResponseEntity.ok(response);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (IllegalArgumentException e) {
             Map<String, String> errorResponse = Map.of(
                     "error", e.getMessage()
 
             );
-            return ResponseEntity.unprocessableEntity().body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         } catch (Exception e) {
             Map<String, String> errorResponse = Map.of(
                     "error", "Failed to cancel counter task",
                     "taskId", taskId
             );
-            return ResponseEntity.unprocessableEntity().body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
