@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,13 +57,6 @@ public class ErrorController {
         }
 
         return errors;
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ConstraintViolationException.class)
-    public Map<String, String> handleConstraintViolation(ConstraintViolationException e) {
-        logger.warn("Constraint violation: {}", e.getMessage());
-        return Map.of("error", e.getMessage() != null ? e.getMessage() : "Validation error");
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

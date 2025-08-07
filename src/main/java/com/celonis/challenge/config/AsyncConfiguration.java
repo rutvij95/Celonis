@@ -16,10 +16,10 @@ public class AsyncConfiguration implements AsyncConfigurer {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
         // We can have more threads than CPU cores
-        executor.setCorePoolSize(5);
-        executor.setMaxPoolSize(10);
+        executor.setCorePoolSize(5); // Minimum number of threads to keep in the pool
+        executor.setMaxPoolSize(10); // Maximum number of threads in the pool
         executor.setQueueCapacity(100);      // Queue if all threads are busy
-        executor.setThreadNamePrefix("CounterTask-");
+        executor.setThreadNamePrefix("CounterTask-"); // Prefix for thread names
 
         // Additional configurations
         executor.setKeepAliveSeconds(60);   // Keep extra threads alive for 60 seconds

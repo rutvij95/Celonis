@@ -43,10 +43,9 @@ public class TaskCleanupServiceTest {
 
     @Test
     public void testCleanupOldTasks() {
-        // Given
-        testTask.setCreationDate(new Date(System.currentTimeMillis() - 7 * 24 * 60 * 60 * 1000)); // Creation date to 7 days ago
-        when(counterTaskRepository.findAllByTaskStatusInAndCreationDateAfter(
-                List.of(TaskStatus.CREATED, TaskStatus.RUNNING), any(Date.class))).thenReturn(List.of(testTask));
+        testTask.setCreationDate(new Date(System.currentTimeMillis() - 8 * 24 * 60 * 60 * 1000L));
+        when(counterTaskRepository.findAllByTaskStatusInAndCreationDateBefore(
+                any(List.class), any(Date.class))).thenReturn(List.of(testTask));
 
         // When
         taskCleanupService.cleanupOldTasks();

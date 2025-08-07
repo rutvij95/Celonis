@@ -25,7 +25,7 @@ public class TaskCleanupService {
     @Autowired
     private CounterTaskRepository counterTaskRepository;
 
-    @Scheduled(fixedRate = 60000) // Every minute
+    @Scheduled(fixedRate = 86400000) // Every 24 hours
 //    @Scheduled(cron = "1 * * * * *")  // Every minute
     @Transactional
     public void cleanupOldTasks() {

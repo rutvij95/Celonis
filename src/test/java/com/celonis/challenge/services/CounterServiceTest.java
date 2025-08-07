@@ -139,9 +139,9 @@ public class CounterServiceTest {
 
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCancelCounterTask_NotRunning() {
+    public void testCancelCounterTask_NotRunningAndNotCreated() {
         // Given
-        testTask.setTaskStatus(TaskStatus.CREATED);
+        testTask.setTaskStatus(TaskStatus.ABORTED);
         when(counterTaskRepository.findById(testTaskId)).thenReturn(Optional.of(testTask));
 
         // When
