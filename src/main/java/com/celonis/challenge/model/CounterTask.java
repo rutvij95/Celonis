@@ -14,7 +14,7 @@ public class CounterTask {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String id;
-
+ 
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationDate;
 
@@ -23,13 +23,13 @@ public class CounterTask {
 
     private TaskStatus taskStatus;
 
-    @NotNull
-    private int startValue;
+    @NotNull(message = "Start value cannot be null")
+    private Integer startValue;
 
-    @NotNull
-    private int endValue;
+    @NotNull(message = "End value cannot be null")
+    private Integer endValue;
 
-    private int currentValue;
+    private Integer currentValue;
 
     public String getId() {
         return id;
@@ -51,27 +51,27 @@ public class CounterTask {
         this.taskStatus = taskStatus;
     }
 
-    public int getStartValue() {
+    public Integer getStartValue() {
         return startValue;
     }
 
-    public void setStartValue(int startValue) {
+    public void setStartValue(Integer startValue) {
         this.startValue = startValue;
     }
 
-    public int getEndValue() {
+    public Integer getEndValue() {
         return endValue;
     }
 
-    public void setEndValue(int endValue) {
+    public void setEndValue(Integer endValue) {
         this.endValue = endValue;
     }
 
-    public int getCurrentValue() {
+    public Integer getCurrentValue() {
         return currentValue;
     }
 
-    public void setCurrentValue(int currentValue) {
+    public void setCurrentValue(Integer currentValue) {
         this.currentValue = currentValue;
     }
 
