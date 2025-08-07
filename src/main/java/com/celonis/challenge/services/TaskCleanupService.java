@@ -30,9 +30,7 @@ public class TaskCleanupService {
     @Transactional
     public void cleanupOldTasks() {
         logger.info("Starting cleanup of old tasks...");
-        Long timeToMillis = 7 * 24 * 60 * 60L; // 7 days in seconds
-        Instant minusInstant = TimeUtil.getCurrentTime().toInstant().minus(timeToMillis, ChronoUnit.SECONDS);
-
+        Instant minusInstant = TimeUtil.getSevenDaysPriorDate();
 
         counterTaskRepository.findAllByTaskStatusInAndCreationDateBefore(
                         List.of(TaskStatus.CREATED, TaskStatus.RUNNING), Date.from(minusInstant))
